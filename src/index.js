@@ -39,6 +39,11 @@ class DOStore extends BaseStore {
     this.endpoint = process.env.GHOST_DO_ENDPOINT || endpoint || ''
   }
 
+  /**
+   * Returns the AWS S3 library for the module functions.
+   * 
+   * @returns {*} s3 - The AWS S3 library for accessing Digital Ocean Spaces.
+   */
   s3() {
     const options = {
       accessKeyId: this.key,
@@ -52,6 +57,13 @@ class DOStore extends BaseStore {
     return new AWS.S3(options)
   }
 
+  /**
+   * Used by the Base storage adapter to check whether a file exists or not.
+   * 
+   * @param {FILE_NAME} fileName - the name of the file which is being uploaded. 
+   * @param {TARGET_DIR} targetDir - the target dir of the file name. This is optional, ensure you first check if a custom dir was passed, otherwise fallback to the default dir/location of files.
+   * @returns {*} promise - A promise which resolves to true or false depending on whether or not the given image has already been stored.
+   */
   exists(fileName, targetDir) {
     return new Promise((resolve, reject) => {
       return this.s3()
@@ -65,6 +77,13 @@ class DOStore extends BaseStore {
     })
   }
 
+  /**
+   * Store the image and return a promise which resolves to the path from which the image should be requested in future.
+   * 
+   * @param {IMAGE} image - an image object with properties name and path
+   * @param {TARGET_DIR} targetDir - a path to where to store the image. Example here: https://github.com/TryGhost/Ghost/blob/master/core/server/adapters/storage/LocalFileStorage.js#L35
+   * @returns {*} promise - A promise which resolves to the full URI of the image, either relative to the blog or absolute.
+   */
   save(image, targetDir) {
     const directory = targetDir || this.getTargetDir(this.subFolder)
 
@@ -88,6 +107,10 @@ class DOStore extends BaseStore {
     })
   }
 
+  /**
+   * Ghost calls serve() as part of its middleware stack, and mounts the returned function as the middleware for serving images.
+   * no arguments. Example implementation here: https://github.com/TryGhost/Ghost/blob/master/core/server/adapters/storage/LocalFileStorage.js#L80
+   */
   serve() {
     return (req, res, next) => {
       this.s3()
@@ -106,6 +129,13 @@ class DOStore extends BaseStore {
     }
   }
 
+  /**
+   * Delete the image and return a promise.
+   * 
+   * @param {FILE_NAME} fileName - the name of the file which is being deleted.
+   * @param {TARGET_DIR} targetDir - a path to where to delete the image from.
+   * @returns {*} promise
+   */
   delete(fileName, targetDir) {
     const directory = targetDir || this.getTargetDir(this.subFolder)
 
@@ -121,6 +151,10 @@ class DOStore extends BaseStore {
     })
   }
 
+  /**
+   * Reads the file from digitalocean storage.
+   * @param {OPTIONS} options - The config options used to read the file.
+   */
   read(options) {
     options = options || {}
 
@@ -128,7 +162,7 @@ class DOStore extends BaseStore {
       // remove trailing slashes
       let path = (options.spaceUrl || '').replace(/\/$|\\$/, '')
 
-      // check if path is stored in s3 handled by us
+      // check if path is stored in digitalocean handled by us
       if (!path.startsWith(this.spaceUrl)) {
         reject(new Error(`${path} is not stored in digital ocean`))
       }
