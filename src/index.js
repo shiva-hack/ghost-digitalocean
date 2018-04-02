@@ -160,7 +160,7 @@ class DOStore extends BaseStore {
 
     return new Promise((resolve, reject) => {
       // remove trailing slashes
-      let path = (options.spaceUrl || '').replace(/\/$|\\$/, '')
+      let path = (options.path || '').replace(/\/$|\\$/, '')
 
       // check if path is stored in digitalocean handled by us
       if (!path.startsWith(this.spaceUrl)) {
