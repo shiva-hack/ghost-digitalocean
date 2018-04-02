@@ -164,7 +164,7 @@ class DOStore extends BaseStore {
 
       // check if path is stored in digitalocean handled by us
       if (!path.startsWith(this.spaceUrl)) {
-        reject(new Error(`${path} is not stored in digital ocean`))
+        return reject(new Error(`${path} is not stored in digital ocean`))
       }
 
       path = path.substring(this.spaceUrl.length)
