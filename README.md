@@ -1,6 +1,6 @@
 # Ghost DigitalOcean Storage Adapter
 
-A Digital Ocean storage adapter for Ghost 1.x
+A Digital Ocean storage adapter for Ghost 1.x and Ghost 2.x
 
 ## Installation
 
